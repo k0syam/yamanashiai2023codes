@@ -20,7 +20,7 @@ def main_generate_theme():
     cgd.add_assistant_message()
     if is_debug:
         print(cgd.show_current_messages())
-    with open("assistant_out_abstract.md", "w", encoding="utf-8") as f:
+    with open("assistant_out_abstract.txt", "w", encoding="utf-8") as f:
         f.write(cgd.show_current_messages()[-1])
     theme_abst = {}
     state_num = 0
