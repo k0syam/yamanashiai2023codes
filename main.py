@@ -53,6 +53,17 @@ def main_generate_theme(output_dir):
     d2c.add_image_generation(theme_abst["目標地点を想起させるイメージに用いる画像生成プロンプト"])
     d2c.download_image_latest(output_dir.joinpath("theme_image.png"))
 
+    # フロントエンド向け変数たち
+    title = theme_abst["タイトル"]
+    general_info = theme_abst["概要"]
+    hashtag = theme_abst["ハッシュタグ"]
+    event_date = datetime.now()
+
+    print("タイトル", title)
+    print("ハッシュタグ", hashtag)
+    print("概要", general_info)
+    print("開催日", event_date)
+
     # TBD: 分割した勉強会内容の詳細・実装例を示す
 
 
