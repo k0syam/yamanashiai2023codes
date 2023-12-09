@@ -1,11 +1,12 @@
 from chatgpt import ChatGPTDialogue
 from dalle2 import Dalle2Communication
-
+from datetime import datetime
+from pathlib import Path
 
 is_debug = True
 
 
-def main_generate_theme():
+def main_generate_theme(output_dir):
     # まずは勉強会の目標地点の概要を出力→dict型で出力結果を保持
     cgd = ChatGPTDialogue()
     cgd.clear_messages(need_default_messages=False)
@@ -20,7 +21,7 @@ def main_generate_theme():
     cgd.add_assistant_message()
     if is_debug:
         print(cgd.show_current_messages())
-    with open("assistant_out_abstract.txt", "w", encoding="utf-8") as f:
+    with open(output_dir.joinpath("assistant_out_abstract.txt"), "w", encoding="utf-8") as f:
         f.write(cgd.show_current_messages()[-1])
     theme_abst = {}
     state_num = 0
@@ -50,10 +51,13 @@ def main_generate_theme():
     # イメージをDALL-E 2で生成
     d2c = Dalle2Communication()
     d2c.add_image_generation(theme_abst["目標地点を想起させるイメージに用いる画像生成プロンプト"])
-    d2c.download_image_latest("theme_image.png")
+    d2c.download_image_latest(output_dir.joinpath("theme_image.png"))
 
     # TBD: 分割した勉強会内容の詳細・実装例を示す
 
 
 if __name__ == "__main__":
-    main_generate_theme()
+    output_dir = "output/"
+    output_dir = Path(output_dir+datetime.now().strftime('%Y%m%d_%H%M%S'))
+    output_dir.mkdir(exist_ok=True, parents=True)
+    main_generate_theme(output_dir=output_dir)
