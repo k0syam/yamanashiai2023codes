@@ -2,6 +2,7 @@ from chatgpt import ChatGPTDialogue
 from dalle2 import Dalle2Communication
 from datetime import datetime
 from pathlib import Path
+from github import GitHubUploader
 
 is_debug = True
 
@@ -61,3 +62,6 @@ if __name__ == "__main__":
     output_dir = Path(output_dir+datetime.now().strftime('%Y%m%d_%H%M%S'))
     output_dir.mkdir(exist_ok=True, parents=True)
     main_generate_theme(output_dir=output_dir)
+
+    github = GitHubUploader()
+    github.upload_dir(dir_path=output_dir)
