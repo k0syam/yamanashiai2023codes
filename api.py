@@ -9,7 +9,27 @@ is_debug = False
 app = FastAPI()
 
 @app.get("/")
-def main_generate_theme():
+def main_generate_theme_example():
+    """サンプル出力用
+
+    Returns:
+        ret: json出力向けdict
+    """
+    framework = "Django REST framework,Pygame"
+    ret = run_generation(framework=framework)
+    return ret
+
+@app.get("/{framework}")
+def main_generate_theme(framework: str):
+    """指定したフレームワークでの出力を得る.3つまで入力可能．カンマ区切りで入力する
+
+    Returns:
+        ret: json出力向けdict
+    """
+    ret = run_generation(framework=framework)
+    return ret
+
+def run_generation(framework):
     # output_dir 静的出力ファイルの保存場所の定義
     output_dir = "output/"
     output_dir = Path(output_dir+datetime.now().strftime('%Y%m%d_%H%M%S'))
@@ -22,9 +42,13 @@ def main_generate_theme():
         s = f.readlines()
         s = "".join(s)
     cgd.add_system_message(s)
-    with open("user_ask_abstract.md", "r", encoding="utf-8") as f:
+    with open("user_ask_abstract_api.md", "r", encoding="utf-8") as f:
         s = f.readlines()
         s = "".join(s)
+        framework_list = ["", "", ""]
+        for i, t in enumerate(framework.split(",")):
+            framework_list[i] = t
+        s = s.replace("$$$FW001$$$", framework_list[0]).replace("$$$FW002$$$", framework_list[1]).replace("$$$FW003$$$", framework_list[2])
     cgd.add_user_message(s)
     cgd.add_assistant_message()
     if is_debug:
@@ -35,7 +59,7 @@ def main_generate_theme():
     state_num = 0
     k_list, v_list = [], []
     for s in cgd.show_current_messages()[-1].split("\n"):
-        print(k_list, v_list, s, state_num)
+        # print(k_list, v_list, s, state_num)
         if state_num == 0:
             if "出力物タイトル" in s:
                 state_num += 1
