@@ -87,7 +87,7 @@ def main_generate_theme(output_dir):
         print(s)
         cgdp.add_user_message(s)
         cgdp.add_assistant_message()
-        output_dir.joinpath(f"chapter{i:02}").mkdir(exist_ok=True, parents=True)
+        output_dir.joinpath(f"chapter{i+1:02}").mkdir(exist_ok=True, parents=True)
         with open(output_dir.joinpath(f"chapter{i+1:02}", "assistant_out.txt"), "w", encoding="utf-8") as f:
             f.write(cgdp.show_current_messages()[-1])
     
