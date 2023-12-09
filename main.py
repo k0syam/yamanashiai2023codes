@@ -3,7 +3,7 @@ from dalle2 import Dalle2Communication
 from datetime import datetime
 from pathlib import Path
 
-is_debug = True
+is_debug = False
 
 
 def main_generate_theme(output_dir):
@@ -32,7 +32,7 @@ def main_generate_theme(output_dir):
             if "出力物タイトル" in s:
                 state_num += 1
         elif state_num == 1:
-            k_list.append(s)
+            k_list.append(s.lstrip("*- "))
             state_num += 1
         elif state_num == 2:
             if "出力物内容" in s:
@@ -40,7 +40,10 @@ def main_generate_theme(output_dir):
         elif state_num == 3 and len(s) >= 1:
             v_list.append(s)
         else:
-            theme_abst["".join(k_list)] = "".join(v_list)
+            if "初心者に5段階で説明するため、段階に分割したタイトル" in k_list or "分割したタイトルの説明" in k_list:
+                theme_abst["".join(k_list)] = v_list
+            else:
+                theme_abst["".join(k_list)] = "".join(v_list)
             k_list, v_list = [], []
             state_num = 0
     if len(v_list) >= 1:
@@ -48,6 +51,7 @@ def main_generate_theme(output_dir):
 
     if is_debug:
         print(theme_abst)
+
     # イメージをDALL-E 2で生成
     d2c = Dalle2Communication()
     d2c.add_image_generation(theme_abst["目標地点を想起させるイメージに用いる画像生成プロンプト"])
@@ -57,14 +61,35 @@ def main_generate_theme(output_dir):
     title = theme_abst["タイトル"]
     general_info = theme_abst["概要"]
     hashtag = theme_abst["ハッシュタグ"]
-    event_date = datetime.now()
+    outline = theme_abst["初心者に5段階で説明するため、段階に分割したタイトル"]
+    outline_info = theme_abst["分割したタイトルの説明"]
+    image_url = d2c.images_url[-1]
 
     print("タイトル", title)
     print("ハッシュタグ", hashtag)
     print("概要", general_info)
-    print("開催日", event_date)
+    print("アウトライン", outline)
+    print("アウトラインの概要", outline_info)
 
-    # TBD: 分割した勉強会内容の詳細・実装例を示す
+    # 分割した勉強会内容の詳細・実装例を示す
+    for i, ol in enumerate(outline):
+        cgdp = ChatGPTDialogue()
+        cgdp.clear_messages(need_default_messages=False)
+        with open("system_instruction.md", "r", encoding="utf-8") as f:
+            s = f.readlines()
+            s = "".join(s)
+        cgdp.add_system_message(s)
+        with open("user_ask_content.md", "r", encoding="utf-8") as f:
+            s = f.readlines()
+            s = "".join(s)
+            s = s.replace("$$$タイトル$$$", title).replace("$$$概要$$$", general_info).replace("$$$順序$$$", "".join(outline)).replace("$$$選択項目$$$", ol)
+        print(s)
+        cgdp.add_user_message(s)
+        cgdp.add_assistant_message()
+        output_dir.joinpath(f"chapter{i:02}").mkdir(exist_ok=True, parents=True)
+        with open(output_dir.joinpath(f"chapter{i+1:02}", "assistant_out.txt"), "w", encoding="utf-8") as f:
+            f.write(cgdp.show_current_messages()[-1])
+    
 
 
 if __name__ == "__main__":
