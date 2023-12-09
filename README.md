@@ -2,13 +2,19 @@
 
 山梨AIハッカソン2023向けのツール群です。
 
-## ChatGPT
+## ChatGPT＋DALL-E 2
 ### つかいかた
-* .envファイルを作成する。.envファイルにはOPENAI_API_KEY=(APIキー)を記入する。
-* python main.pyを実行する。-> assistant_out.mdが更新される
+1. .envファイルを作成する。.envファイルにはOPENAI_API_KEY=(APIキー)を記入する。
+1. python main.pyを実行する。
 
-### プロンプト
-* system_instruction.md, user_ask.md
+### 入力プロンプト
+* system_instruction.md: 背景となる指示のプロンプト．
+* user_ask_abstract.md: 概要を出力をするためのプロンプト．
+
+### 出力されるもの
+* assistant_out_abstract.txt: 勉強会の概要
+* theme_abst: 勉強会概要を辞書形式で保持（main.py内）
+* theme_image.png: 勉強会に付随するイメージ
 
 ### 使用ライブラリ
 * openai
