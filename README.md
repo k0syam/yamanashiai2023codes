@@ -11,7 +11,7 @@
 * system_instruction.md: 背景となる指示のプロンプト．
 * user_ask_abstract.md: 概要を出力をするためのプロンプト．
 
-### 出力されるもの
+### 出力されるもの(output/実行時刻のフォルダが作られる)
 * assistant_out_abstract.txt: 勉強会の概要
 * theme_abst: 勉強会概要を辞書形式で保持（main.py内）
 * theme_image.png: 勉強会に付随するイメージ
