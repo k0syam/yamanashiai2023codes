@@ -3,6 +3,7 @@ from dalle2 import Dalle2Communication
 from datetime import datetime
 from pathlib import Path
 from github import GitHubUploader
+from document import DocumentEditor
 
 is_debug = False
 
@@ -72,6 +73,20 @@ def main_generate_theme(output_dir):
     print("アウトライン", outline)
     print("アウトラインの概要", outline_info)
 
+    # 勉強会内容のドキュメント生成
+    doc_dir = output_dir.joinpath("documents")
+    doc_dir.mkdir(exist_ok=True, parents=True)
+    editor = DocumentEditor(doc_dir)
+    editor.add_h1(title)
+    editor.add_h2("概要")
+    editor.add_content(general_info)
+    editor.add_h2("目次")
+    for i, ol in enumerate(outline):
+        info = outline_info[i]
+        editor.add_content(f"1. [{ol}](chapter{i+1:02})")
+        editor.add_content(f"    - {info}")    
+    editor.write()
+
     # 分割した勉強会内容の詳細・実装例を示す
     for i, ol in enumerate(outline):
         cgdp = ChatGPTDialogue()
@@ -90,7 +105,36 @@ def main_generate_theme(output_dir):
         output_dir.joinpath(f"chapter{i+1:02}").mkdir(exist_ok=True, parents=True)
         with open(output_dir.joinpath(f"chapter{i+1:02}", "assistant_out.txt"), "w", encoding="utf-8") as f:
             f.write(cgdp.show_current_messages()[-1])
-    
+        
+        # 分割した勉強会内容のドキュメント生成
+        chapter_doc_dir = doc_dir.joinpath(f"chapter{i+1:02}")
+        chapter_doc_dir.mkdir(exist_ok=True, parents=True)
+        chapter_editor = DocumentEditor(chapter_doc_dir)
+        chapter_state_num = 0
+        chapter_k_list, chapter_v_list = [], []
+        for s in cgdp.show_current_messages()[-1].split("\n"):
+            if chapter_state_num == 0:
+                if "出力物タイトル" in s:
+                    chapter_state_num += 1
+            elif chapter_state_num == 1:
+                k_list.append(s.lstrip("*- "))
+                chapter_state_num += 1
+            elif chapter_state_num == 2:
+                if "出力物内容" in s:
+                    chapter_state_num += 1
+            elif chapter_state_num == 3 and len(s) >= 1:
+                v_list.append(s)
+            else:
+                k = "".join(k_list)
+                v = "\n".join(v_list)
+                if k == "教材タイトル":
+                    chapter_editor.add_h1(v)
+                else:
+                    chapter_editor.add_h2(k)
+                    chapter_editor.add_content(v)
+                k_list, v_list = [], []
+                chapter_state_num = 0
+        chapter_editor.write()
 
 
 if __name__ == "__main__":
