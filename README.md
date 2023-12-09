@@ -5,7 +5,9 @@
 ## ChatGPT＋DALL-E 2
 ### つかいかた
 1. .envファイルを作成する。.envファイルにはOPENAI_API_KEY=(APIキー)を記入する。
-1. python main.pyを実行する。
+1. python main.pyを実行する。(ローカル実行の場合)
+1. uvicorn api:app --reload (APIたちあげ)
+  * GET http://localhost:8000 -> jsonかえってきます
 
 ### 入力プロンプト
 * system_instruction.md: 背景となる指示のプロンプト．
