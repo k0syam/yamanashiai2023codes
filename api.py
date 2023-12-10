@@ -28,7 +28,7 @@ def main_generate_theme_example():
     """
     framework = "Django REST framework,Pygame"
     # ret = run_generation(framework=framework)
-    ret = run_generation_with_documents(framework=framework)
+    ret = run_generation_with_documents(framework=framework, enable_github_upload=False)
     return ret
 
 @app.get("/{framework}")
@@ -39,7 +39,7 @@ def main_generate_theme(framework: str):
         ret: json出力向けdict
     """
     # ret = run_generation(framework=framework)
-    ret = run_generation_with_documents(framework=framework)
+    ret = run_generation_with_documents(framework=framework, enable_github_upload=False)
     return ret
 
 def run_generation(framework):
@@ -140,7 +140,7 @@ def run_generation(framework):
 
     return ret
 
-def run_generation_with_documents(framework):
+def run_generation_with_documents(framework, enable_github_upload=False):
     # output_dir 静的出力ファイルの保存場所の定義
     output_dir = "output/"
     output_dir = Path(output_dir+datetime.now().strftime('%Y%m%d_%H%M%S'))
@@ -276,6 +276,10 @@ def run_generation_with_documents(framework):
                 k_list, v_list = [], []
                 chapter_state_num = 0
         chapter_editor.write()
+
+    if enable_github_upload:
+        github = GitHubUploader()
+        github.upload_dir(dir_path=output_dir)
 
     # 出力変数：jsonでかえす
     ret = {}

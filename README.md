@@ -1,10 +1,14 @@
 # yamanashiai2023codes
 
-山梨AIハッカソン2023向けのツール群です。
+山梨AIハッカソン2023向けのツール群です。（山本勘助晴幸バックエンド）
 
 ## ChatGPT＋DALL-E 2
 ### つかいかた
-1. .envファイルを作成する。.envファイルにはOPENAI_API_KEY=(APIキー)を記入する。
+1. .envファイルを作成する。.envに以下の項目を各トークンAPIキーに加えて、GitHubのリポジトリも事前に準備すること！
+  * OPENAI_API_KEY=(OPENAIのAPIキー)
+  * GITHUB_TOKEN=(GitHubのトークン)
+  * GITHUB_REPO_OWNER=(GitHubのユーザ名)
+  * GITHUB_REPO_NAME=(GitHubのリポジトリ名)
 1. python main.pyを実行する。(ローカル実行の場合)
 1. uvicorn api:app --reload (APIたちあげ)
   * GET http://localhost:8000 -> jsonかえってきます
